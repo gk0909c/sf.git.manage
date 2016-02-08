@@ -10,19 +10,22 @@
 + 最新化したリソースをデプロイ
 + Apexテスト実行
 
-## Unit test ##
-+ To Execute gk0909c.sf.git.manage.git.TestGitOperator,  
-  Make yaml file in src/test/resources/TestGitOperator.  
-  Like this.  
+## Run ##
++ create reporsitoryInfo.yml in classpath, like this.
   
   ```yaml
   # put repository info you can access.
-  # testGetReporsitory01.yml is no user, no pw.
-  # testGetReporsitory01.yml is your user, your pw.
-  user: 
-  pw: 
-  uri: https://github.com/satk0909/sf.git.manage.git
-  repoName: sf.git.manage
+  user: your user      # if you needs credential
+  pw: your password    # if you needs credential
+  uri: https://github.com/your/repository.git
+  repoName: your.repository
   localBase: C:/git-temp/ 
+  branchName: master
   ```
+  
+## Unit test ##
++ To Execute gk0909c.sf.git.manage.git.TestGitOperator,  
+  Make yaml file in classpath.  
+  + testGetReporsitory01.yml is no user, no pw.
+  + testGetReporsitory02.yml is your user, your pw.
   

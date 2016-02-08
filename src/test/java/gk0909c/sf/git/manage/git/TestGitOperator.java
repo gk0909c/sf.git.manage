@@ -27,7 +27,7 @@ public class TestGitOperator extends TestCase {
 			operator.pullBranch(git);
 		} finally {
 			git.close();
-			//TestHelper.delete("C:/git-temp/sf.git.manage");
+			TestHelper.delete("C:/git-temp/sf.git.manage");
 		}
 		
 	}

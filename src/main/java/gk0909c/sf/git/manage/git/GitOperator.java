@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
@@ -22,9 +23,11 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 class GitOperator {
 	private RepositoryInfo repInfo;
+	private CredentialsProvider credential ;
 	
 	GitOperator(RepositoryInfo repInfo) {
 		this.repInfo = repInfo;
+		credential = new UsernamePasswordCredentialsProvider(repInfo.getUser(), repInfo.getPw());
 	}
 	
 	/**
@@ -52,7 +55,6 @@ class GitOperator {
 			clone.setDirectory(localRepository);
 
 			if (repInfo.getUser() != null) {
-				CredentialsProvider credential = new UsernamePasswordCredentialsProvider(repInfo.getUser(), repInfo.getPw());
 				clone.setCredentialsProvider(credential);
 			}
 			git = clone.call();
@@ -82,7 +84,9 @@ class GitOperator {
 		} catch (RefAlreadyExistsException e) {
 			git.checkout().setName(repInfo.getBranchName()).call();
 		} finally {
-			git.pull().call();
+			PullCommand pull = git.pull();
+			pull.setCredentialsProvider(credential);
+			pull.call();
 		}
 	}
 }
