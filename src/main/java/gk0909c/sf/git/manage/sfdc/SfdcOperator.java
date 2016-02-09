@@ -1,9 +1,7 @@
 package gk0909c.sf.git.manage.sfdc;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.metadata.AsyncResult;
@@ -19,16 +17,30 @@ import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
-import gk0909c.sf.git.manage.zip.ZipCreater;
+import gk0909c.sf.git.manage.zip.ZipInfo;
 
+/**
+ * sfdc deploy.
+ * @author satk0909
+ *
+ */
 public class SfdcOperator {
-	private MetadataConnection metaConn;
+	private static final long ONE_SECOND = 1000;
+	private static final int MAX_NUM_POLL_REQUESTS = 50;
 	
+	protected MetadataConnection metaConn;
+	
+	/**
+	 * set up sfdc connection.
+	 * @param info SfdcInfo
+	 * @throws ConnectionException
+	 */
 	public SfdcOperator(SfdcInfo info) throws ConnectionException {
 		ConnectorConfig config = new ConnectorConfig();
 		config.setAuthEndpoint(info.getPartnerUri());
 		config.setServiceEndpoint(info.getPartnerUri());
 		config.setManualLogin(true);
+		setProxy(config);
 		PartnerConnection partnerConn = new PartnerConnection(config);
 		LoginResult loginResult = partnerConn.login(info.getUser(), info.getPw() + info.getSecurityToken());
 				
@@ -38,12 +50,14 @@ public class SfdcOperator {
 		metaConn = new MetadataConnection(config);
 	}
 	
-	public void getMetadata() throws Exception {
-		String ZIP_FILE = "C:/git-temp/tmp/test.zip";
-		long ONE_SECOND = 1000;
-		int MAX_NUM_POLL_REQUESTS = 50;
-		
-		FileInputStream fileInputStream = new FileInputStream(ZIP_FILE);
+	/**
+	 * deploy metadata
+	 * @param zipInfo
+	 * @throws Exception
+	 */
+	public void deployMetadata(ZipInfo zipInfo) throws Exception {
+		// zipファイル読み込み
+		FileInputStream fileInputStream = new FileInputStream(zipInfo.getZipPath());
 		byte zipBytes[] = null;
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -57,12 +71,27 @@ public class SfdcOperator {
 			fileInputStream.close();
 		}
 		
+		// デプロイ
 		DeployOptions deployOptions = new DeployOptions();
 		deployOptions.setPerformRetrieve(false);
 		deployOptions.setRollbackOnError(true);
 		AsyncResult asyncResult = metaConn.deploy(zipBytes, deployOptions);
-
-		// wait finish =================================================================
+		DeployResult result = waitForDeployCompletion(asyncResult.getId());
+		
+		// 結果確認
+		if (!result.isSuccess()) {
+			printErrors(result, "Final list of failures:\n");
+			throw new Exception("The files were not successfully deployed");
+		}
+	}
+	
+	/**
+	 * wait for deploy completion.
+	 * @param asyncResultId
+	 * @return
+	 * @throws Exception
+	 */
+	private DeployResult waitForDeployCompletion(String asyncResultId) throws Exception {
 		int poll = 0;
 		long waitTimeMilliSecs = ONE_SECOND;
 		DeployResult deployResult;
@@ -79,31 +108,29 @@ public class SfdcOperator {
 			}
 			// Fetch in-progress details once for every 3 polls
 			fetchDetails = (poll % 3 == 0);
-			deployResult = metaConn.checkDeployStatus(asyncResult.getId(), fetchDetails);
+			deployResult = metaConn.checkDeployStatus(asyncResultId, fetchDetails);
 			System.out.println("Status is: " + deployResult.getStatus());
 			if (!deployResult.isDone() && fetchDetails) {
 				printErrors(deployResult, "Failures for deployment in progress:\n");
 			}
 		}
 		while (!deployResult.isDone());
-		// wait finish =================================================================
-		
 		if (!deployResult.isSuccess() && deployResult.getErrorStatusCode() != null) {
 			throw new Exception(deployResult.getErrorStatusCode() + " msg: " +
 					deployResult.getErrorMessage());
 		}
-		
 		if (!fetchDetails) {
 			// Get the final result with details if we didn't do it in the last attempt.
-			deployResult = metaConn.checkDeployStatus(asyncResult.getId(), true);
+			deployResult = metaConn.checkDeployStatus(asyncResultId, true);
 		}
-		
-		if (!deployResult.isSuccess()) {
-			printErrors(deployResult, "Final list of failures:\n");
-			throw new Exception("The files were not successfully deployed");
-		}
+		return deployResult;
 	}
 	
+	/**
+	 * print deployErrors
+	 * @param result
+	 * @param messageHeader
+	 */
 	private static void printErrors(DeployResult result, String messageHeader) {
 		DeployDetails details = result.getDetails();
 		StringBuilder stringBuilder = new StringBuilder();
@@ -120,6 +147,7 @@ public class SfdcOperator {
 				stringBuilder.append(failure.getFileName() + loc + ":"
 						+ failure.getProblem()).append('\n');
 			}
+			
 			RunTestsResult rtr = details.getRunTestResult();
 			if (rtr.getFailures() != null) {
 				for (RunTestFailure failure : rtr.getFailures()) {
@@ -130,6 +158,7 @@ public class SfdcOperator {
 							" stack " + failure.getStackTrace() + "\n\n");
 				}
 			}
+			
 			if (rtr.getCodeCoverageWarnings() != null) {
 				for (CodeCoverageWarning ccw : rtr.getCodeCoverageWarnings()) {
 					stringBuilder.append("Code coverage issue");
@@ -142,9 +171,29 @@ public class SfdcOperator {
 				}
 			}
 		}
+		
 		if (stringBuilder.length() > 0) {
 			stringBuilder.insert(0, messageHeader);
 			System.out.println(stringBuilder.toString());
+		}
+	}
+	
+	/**
+	 * proxy setting
+	 * @param config
+	 */
+	private void setProxy(ConnectorConfig config) {
+		if (System.getProperty("https.proxyHost") != null ) {
+			config.setProxy(System.getProperty("https.proxyHost"),
+							Integer.parseInt(System.getProperty("https.proxyPort")));
+		}
+		
+		if (System.getProperty("https.proxyUser") != null ) {
+			config.setProxyUsername(System.getProperty("https.proxyUser"));
+		}
+		
+		if (System.getProperty("https.proxyPassword") != null ) {
+			config.setProxyPassword(System.getProperty("https.Password"));
 		}
 	}
 }

@@ -11,21 +11,34 @@
 + Apexテスト実行
 
 ## Run ##
-+ create reporsitoryInfo.yml in classpath, like this.
++ create setting.yml in classpath, like this.
   
   ```yaml
   # put repository info you can access.
-  user: your user      # if you needs credential
-  pw: your password    # if you needs credential
-  uri: https://github.com/your/repository.git
-  repoName: your.repository
-  localBase: C:/git-temp/ 
-  branchName: master
+  repository: !!gk0909c.sf.git.manage.git.RepositoryInfo
+    user: user
+    pw: password
+    uri: http://example.com:8080/your/repository.git
+    repoName: yourRepsitory
+    localBase: C:/localtion/ 
+    branchName: yourBranch
+  # put sfdc info you can access.
+  sfdc: !!gk0909c.sf.git.manage.sfdc.SfdcInfo
+    user: user
+    pw: password
+    securityToken: securityToken
+    partnerUri: https://test.salesforce.com/services/Soap/u/35.0
+  # zip and deploy metadata location.
+  zip: !!gk0909c.sf.git.manage.zip.ZipInfo
+    zipPath: C:/location/metadata.zip
+    baseDir: C:/localtion/repository/sfdc-src-path
+
   ```
   
 ## Unit test ##
 + To Execute gk0909c.sf.git.manage.git.TestGitOperator,  
-  Make yaml file in classpath.  
-  + testGetReporsitory01.yml is no user, no pw.
-  + testGetReporsitory02.yml is your user, your pw.
+  Make yaml file in classpath.  (only repository info. no need hierarchy.)
+  + testGetReporsitory01.yml, with no user, no pw.
+  + testGetReporsitory02.yml, with your user, your pw.
   
+## behind proxy ##

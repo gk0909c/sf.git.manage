@@ -8,6 +8,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRefNameException;
@@ -18,16 +19,13 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 public class GitOperator {
 	private RepositoryInfo repInfo;
-	private CredentialsProvider credential ;
 	
 	public GitOperator(RepositoryInfo repInfo) {
 		this.repInfo = repInfo;
-		credential = new UsernamePasswordCredentialsProvider(repInfo.getUser(), repInfo.getPw());
 	}
 	
 	/**
@@ -53,10 +51,8 @@ public class GitOperator {
 			CloneCommand clone = Git.cloneRepository();
 			clone.setURI(repInfo.getUri());
 			clone.setDirectory(localRepository);
-
-			if (repInfo.getUser() != null) {
-				clone.setCredentialsProvider(credential);
-			}
+			setCredentials(clone);
+			
 			git = clone.call();
 		}
 		
@@ -85,8 +81,18 @@ public class GitOperator {
 			git.checkout().setName(repInfo.getBranchName()).call();
 		} finally {
 			PullCommand pull = git.pull();
-			pull.setCredentialsProvider(credential);
+			setCredentials(pull);
 			pull.call();
+		}
+	}
+	
+	/**
+	 * set credentials
+	 * @param command
+	 */
+	private void setCredentials(@SuppressWarnings("rawtypes") TransportCommand command) {
+		if (repInfo.getUser() != null) {
+			command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(repInfo.getUser(), repInfo.getPw()));
 		}
 	}
 }
