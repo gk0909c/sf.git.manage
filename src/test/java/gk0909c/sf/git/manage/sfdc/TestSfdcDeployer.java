@@ -24,7 +24,8 @@ public class TestSfdcDeployer {
 		SfdcDeployer operator = new SfdcDeployer(sfdcInfo);
 		operator.deployMetadata(zipInfo);
 		
-		DeleteResult[] result  = operator.metaConn.deleteMetadata("CustomLabel", new String[]{"Gk_TestDeployLabel"});
+		DeleteResult[] result  = SfdcConnector.getConnection(sfdcInfo).getMetadataConnection()
+				.deleteMetadata("CustomLabel", new String[]{"Gk_TestDeployLabel"});
 		new File(zipInfo.getZipPath()).delete();
 		
 		assertTrue(result[0].getSuccess());

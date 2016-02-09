@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.Yaml;
 import gk0909c.sf.git.manage.git.GitOperator;
 import gk0909c.sf.git.manage.git.RepositoryInfo;
 import gk0909c.sf.git.manage.sfdc.SfdcInfo;
+import gk0909c.sf.git.manage.sfdc.SfdcTestRunner;
 import gk0909c.sf.git.manage.sfdc.SfdcDeployer;
 import gk0909c.sf.git.manage.zip.ZipCreater;
 import gk0909c.sf.git.manage.zip.ZipInfo;
@@ -29,7 +30,7 @@ public class App {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> settingMap = yaml.loadAs(ClassLoader.getSystemResourceAsStream("setting.yml"), Map.class);
 		
-		// リポジトリ取得
+		/*// リポジトリ取得
 		RepositoryInfo repositoryInfo = (RepositoryInfo)settingMap.get("repository");
 		GitOperator gitOperator = new GitOperator(repositoryInfo);
 		Git git = gitOperator.cloneReporsitory();
@@ -38,9 +39,9 @@ public class App {
 		gitOperator.pullBranch(git);
 		
 		// Zip作成
-		ZipInfo zipInfo = (ZipInfo)settingMap.get("zip");
-		ZipCreater helper = new ZipCreater();
-		helper.createZip(zipInfo.getZipPath(), zipInfo.getBaseDir());
+*/		ZipInfo zipInfo = (ZipInfo)settingMap.get("zip");
+		/*ZipCreater helper = new ZipCreater();
+		helper.createZip(zipInfo.getZipPath(), zipInfo.getBaseDir());*/
 		
 		// Deploy
 		SfdcInfo sfdcInfo = (SfdcInfo)settingMap.get("sfdc");
@@ -48,6 +49,8 @@ public class App {
 		operator.deployMetadata(zipInfo);
 		
 		// Run Test
+		SfdcTestRunner runner = new SfdcTestRunner(sfdcInfo);
+		runner.runTest();
 		
     }
 }

@@ -3,7 +3,6 @@ package gk0909c.sf.git.manage.sfdc;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 
-import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.metadata.AsyncResult;
 import com.sforce.soap.metadata.CodeCoverageWarning;
 import com.sforce.soap.metadata.DeployDetails;
@@ -13,9 +12,7 @@ import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.soap.metadata.RunTestFailure;
 import com.sforce.soap.metadata.RunTestsResult;
-import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
 
 import gk0909c.sf.git.manage.zip.ZipInfo;
 
@@ -28,7 +25,7 @@ public class SfdcDeployer {
 	private static final long ONE_SECOND = 1000;
 	private static final int MAX_NUM_POLL_REQUESTS = 50;
 	
-	protected MetadataConnection metaConn;
+	private MetadataConnection metaConn;
 	
 	/**
 	 * set up sfdc connection.
@@ -36,18 +33,8 @@ public class SfdcDeployer {
 	 * @throws ConnectionException
 	 */
 	public SfdcDeployer(SfdcInfo info) throws ConnectionException {
-		ConnectorConfig config = new ConnectorConfig();
-		config.setAuthEndpoint(info.getPartnerUri());
-		config.setServiceEndpoint(info.getPartnerUri());
-		config.setManualLogin(true);
-		setProxy(config);
-		PartnerConnection partnerConn = new PartnerConnection(config);
-		LoginResult loginResult = partnerConn.login(info.getUser(), info.getPw() + info.getSecurityToken());
-				
-		config = partnerConn.getConfig();
-		config.setServiceEndpoint(loginResult.getMetadataServerUrl());
-		config.setSessionId(loginResult.getSessionId());
-		metaConn = new MetadataConnection(config);
+		SfdcConnector conn = SfdcConnector.getConnection(info);
+		metaConn = conn.getMetadataConnection();
 	}
 	
 	/**
@@ -175,25 +162,6 @@ public class SfdcDeployer {
 		if (stringBuilder.length() > 0) {
 			stringBuilder.insert(0, messageHeader);
 			System.out.println(stringBuilder.toString());
-		}
-	}
-	
-	/**
-	 * proxy setting
-	 * @param config
-	 */
-	private void setProxy(ConnectorConfig config) {
-		if (System.getProperty("https.proxyHost") != null ) {
-			config.setProxy(System.getProperty("https.proxyHost"),
-							Integer.parseInt(System.getProperty("https.proxyPort")));
-		}
-		
-		if (System.getProperty("https.proxyUser") != null ) {
-			config.setProxyUsername(System.getProperty("https.proxyUser"));
-		}
-		
-		if (System.getProperty("https.proxyPassword") != null ) {
-			config.setProxyPassword(System.getProperty("https.proxyPassword"));
 		}
 	}
 }
