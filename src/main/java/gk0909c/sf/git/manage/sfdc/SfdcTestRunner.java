@@ -2,6 +2,9 @@ package gk0909c.sf.git.manage.sfdc;
 
 import java.math.BigDecimal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sforce.soap.apex.CodeCoverageResult;
 import com.sforce.soap.apex.CodeCoverageWarning;
 import com.sforce.soap.apex.RunTestFailure;
@@ -12,6 +15,7 @@ import com.sforce.ws.ConnectionException;
 
 public class SfdcTestRunner {
 	private SoapConnection soapConn;
+	private Logger logger = LoggerFactory.getLogger(SfdcTestRunner.class);
 	
 	public SfdcTestRunner(SfdcInfo info) throws ConnectionException {
 		SfdcConnector conn = SfdcConnector.getConnection(info);
@@ -32,29 +36,29 @@ public class SfdcTestRunner {
 		CovarageInfo coverageInfo = new CovarageInfo();
 		final String coverageMessage = "\tClass: %s, step: %d, coverage: %.2f";
 		
-		System.out.println("## Coverages ##");
+		logger.info("## Coverages ##");
 		for (CodeCoverageResult result : coverages) {
 			coverageInfo.putCovarage(result);
 			
-			System.out.println(String.format(coverageMessage,
-												result.getName(),
-												result.getNumLocations(),
-												coverageInfo.calc()));
+			logger.info(String.format(coverageMessage,
+										result.getName(),
+										result.getNumLocations(),
+										coverageInfo.calc()));
 		}
 		
-		System.out.println("## Warnings ##");
+		logger.info("## Warnings ##");
 		for (CodeCoverageWarning warning : warnings) {
-			System.out.println("\t" + warning.getMessage());
+			logger.warn("\t" + warning.getMessage());
 		}
 
-		System.out.println("## Failures ##");
+		logger.info("## Failures ##");
 		for (RunTestFailure failure : failures) {
-			System.out.println("\t" + failure.getStackTrace());
-			System.out.println("\t\t" + failure.getMessage());
+			logger.error("\t" + failure.getStackTrace());
+			logger.error("\t\t" + failure.getMessage());
 		}
 		
-		System.out.println("## total coverage ##");
-		System.out.println(String.format("\t%.2f", coverageInfo.totalCalc()));
+		logger.info("## total coverage ##");
+		logger.info(String.format("\t%.2f", coverageInfo.totalCalc()));
 	}
 	
 	private class CovarageInfo {

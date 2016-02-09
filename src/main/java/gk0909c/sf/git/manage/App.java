@@ -3,6 +3,8 @@ package gk0909c.sf.git.manage;
 import java.util.Map;
 
 import org.eclipse.jgit.api.Git;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import gk0909c.sf.git.manage.git.GitOperator;
@@ -25,12 +27,16 @@ public class App {
 	 * @throws Exception
 	 */
     public static void main( String[] args ) throws Exception {
+    	Logger logger = LoggerFactory.getLogger(App.class);
+    	
+    	
     	// 設定情報取得
     	Yaml yaml = new Yaml();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> settingMap = yaml.loadAs(ClassLoader.getSystemResourceAsStream("setting.yml"), Map.class);
 		
-		// リポジトリ取得
+		// メタデータ取得
+    	logger.info("Get repository resource.");
 		RepositoryInfo repositoryInfo = (RepositoryInfo)settingMap.get("repository");
 		GitOperator gitOperator = new GitOperator(repositoryInfo);
 		Git git = gitOperator.cloneReporsitory();
@@ -39,16 +45,19 @@ public class App {
 		gitOperator.pullBranch(git);
 		
 		// Zip作成
+    	logger.info("create upload zipfile.");
 		ZipInfo zipInfo = (ZipInfo)settingMap.get("zip");
 		ZipCreater helper = new ZipCreater();
 		helper.createZip(zipInfo.getZipPath(), zipInfo.getBaseDir());
 		
 		// Deploy
+    	logger.info("deploy to Salesforce.");
 		SfdcInfo sfdcInfo = (SfdcInfo)settingMap.get("sfdc");
 		SfdcDeployer operator = new SfdcDeployer(sfdcInfo);
 		operator.deployMetadata(zipInfo);
 		
 		// Run Test
+    	logger.info("run tests.");
 		SfdcTestRunner runner = new SfdcTestRunner(sfdcInfo);
 		runner.runTest();
 		

@@ -3,8 +3,10 @@ package gk0909c.sf.git.manage.sfdc;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sforce.soap.metadata.AsyncResult;
-import com.sforce.soap.metadata.CodeCoverageWarning;
 import com.sforce.soap.metadata.DeployDetails;
 import com.sforce.soap.metadata.DeployMessage;
 import com.sforce.soap.metadata.DeployOptions;
@@ -26,6 +28,7 @@ public class SfdcDeployer {
 	private static final int MAX_NUM_POLL_REQUESTS = 50;
 	
 	private MetadataConnection metaConn;
+	private Logger logger = LoggerFactory.getLogger(SfdcDeployer.class);
 	
 	/**
 	 * set up sfdc connection.
@@ -96,7 +99,8 @@ public class SfdcDeployer {
 			// Fetch in-progress details once for every 3 polls
 			fetchDetails = (poll % 3 == 0);
 			deployResult = metaConn.checkDeployStatus(asyncResultId, fetchDetails);
-			System.out.println("Status is: " + deployResult.getStatus());
+			logger.info("Status is: " + deployResult.getStatus());
+			
 			if (!deployResult.isDone() && fetchDetails) {
 				printErrors(deployResult, "Failures for deployment in progress:\n");
 			}
@@ -118,21 +122,18 @@ public class SfdcDeployer {
 	 * @param result
 	 * @param messageHeader
 	 */
-	private static void printErrors(DeployResult result, String messageHeader) {
+	private void printErrors(DeployResult result, String messageHeader) {
 		DeployDetails details = result.getDetails();
-		StringBuilder stringBuilder = new StringBuilder();
 		if (details != null) {
 			DeployMessage[] componentFailures = details.getComponentFailures();
 			for (DeployMessage failure : componentFailures) {
-				String loc = "(" + failure.getLineNumber() + ", " +
-						failure.getColumnNumber();
-				if (loc.length() == 0 &&
-						!failure.getFileName().equals(failure.getFullName()))
-				{
+				String loc = "(" + failure.getLineNumber() + ", " + failure.getColumnNumber() + ")";
+				
+				if (loc.length() == 0 && !failure.getFileName().equals(failure.getFullName())) {
 					loc = "(" + failure.getFullName() + ")";
 				}
-				stringBuilder.append(failure.getFileName() + loc + ":"
-						+ failure.getProblem()).append('\n');
+				
+				logger.error(failure.getFileName() + loc + " : " + failure.getProblem());
 			}
 			
 			RunTestsResult rtr = details.getRunTestResult();
@@ -140,28 +141,12 @@ public class SfdcDeployer {
 				for (RunTestFailure failure : rtr.getFailures()) {
 					String n = (failure.getNamespace() == null ? "" :
 						(failure.getNamespace() + ".")) + failure.getName();
-					stringBuilder.append("Test failure, method: " + n + "." +
+					
+					logger.error("Test failure, method: " + n + "." +
 							failure.getMethodName() + " -- " + failure.getMessage() +
 							" stack " + failure.getStackTrace() + "\n\n");
 				}
 			}
-			
-			if (rtr.getCodeCoverageWarnings() != null) {
-				for (CodeCoverageWarning ccw : rtr.getCodeCoverageWarnings()) {
-					stringBuilder.append("Code coverage issue");
-					if (ccw.getName() != null) {
-						String n = (ccw.getNamespace() == null ? "" :
-							(ccw.getNamespace() + ".")) + ccw.getName();
-						stringBuilder.append(", class: " + n);
-					}
-					stringBuilder.append(" -- " + ccw.getMessage() + "\n");
-				}
-			}
-		}
-		
-		if (stringBuilder.length() > 0) {
-			stringBuilder.insert(0, messageHeader);
-			System.out.println(stringBuilder.toString());
 		}
 	}
 }
