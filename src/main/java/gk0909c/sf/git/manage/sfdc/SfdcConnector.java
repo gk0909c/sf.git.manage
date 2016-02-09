@@ -14,8 +14,8 @@ import com.sforce.ws.ConnectorConfig;
  */
 class SfdcConnector {
 	private static SfdcConnector me;
-	private SoapConnection soapConn;
 	private MetadataConnection metaConn;
+	private SoapConnection soapConn;
 	
 	private SfdcConnector(){}
 	
@@ -26,26 +26,28 @@ class SfdcConnector {
 		
 		// login
 		me = new SfdcConnector();
-		ConnectorConfig config = new ConnectorConfig();
-		config.setAuthEndpoint(info.getPartnerUri());
-		config.setServiceEndpoint(info.getPartnerUri());
-		config.setManualLogin(true);
-		setProxy(config);
-		PartnerConnection partnerConn = new PartnerConnection(config);
+		ConnectorConfig partnerConfig = new ConnectorConfig();
+		partnerConfig.setAuthEndpoint(info.getPartnerUri());
+		partnerConfig.setServiceEndpoint(info.getPartnerUri());
+		partnerConfig.setManualLogin(true);
+		setProxy(partnerConfig);
+		PartnerConnection partnerConn = new PartnerConnection(partnerConfig);
 		LoginResult loginResult = partnerConn.login(info.getUser(),
 														info.getPw() + info.getSecurityToken());
 		
-		// get metadata connection
-		config = partnerConn.getConfig();
-		config.setServiceEndpoint(loginResult.getMetadataServerUrl());
-		config.setSessionId(loginResult.getSessionId());
-		me.metaConn = new MetadataConnection(config);
+		// get Metadata connection
+		ConnectorConfig metadataConfig = new ConnectorConfig();
+		metadataConfig.setServiceEndpoint(loginResult.getMetadataServerUrl());
+		metadataConfig.setSessionId(loginResult.getSessionId());
+		setProxy(metadataConfig);
+		me.metaConn = new MetadataConnection(metadataConfig);
 		
-		// get SoapConnection
-		config = partnerConn.getConfig();
-		config.setServiceEndpoint(loginResult.getServerUrl().replace("Soap/u", "Soap/s"));
-		config.setSessionId(loginResult.getSessionId());
-		me.soapConn = new SoapConnection(config);
+		// get Soap Connection
+		ConnectorConfig soapConfig = new ConnectorConfig();
+		soapConfig.setServiceEndpoint(loginResult.getServerUrl().replace("Soap/u", "Soap/s"));
+		soapConfig.setSessionId(loginResult.getSessionId());
+		setProxy(soapConfig);
+		me.soapConn = new SoapConnection(soapConfig);
 		
 		return me;
 	}
