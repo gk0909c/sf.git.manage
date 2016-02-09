@@ -21,11 +21,11 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
-class GitOperator {
+public class GitOperator {
 	private RepositoryInfo repInfo;
 	private CredentialsProvider credential ;
 	
-	GitOperator(RepositoryInfo repInfo) {
+	public GitOperator(RepositoryInfo repInfo) {
 		this.repInfo = repInfo;
 		credential = new UsernamePasswordCredentialsProvider(repInfo.getUser(), repInfo.getPw());
 	}
@@ -39,7 +39,7 @@ class GitOperator {
 	 * @throws GitAPIException
 	 * @throws IOException
 	 */
-	protected Git cloneReporsitory() throws InvalidRemoteException, TransportException, GitAPIException, IOException {
+	public Git cloneReporsitory() throws InvalidRemoteException, TransportException, GitAPIException, IOException {
 		Git git = null;
 		File localRepository = new File(repInfo.getLocalBase() + repInfo.getRepoName());
 		
@@ -72,7 +72,7 @@ class GitOperator {
 	 * @throws CheckoutConflictException
 	 * @throws GitAPIException
 	 */
-	protected void pullBranch(Git git) throws RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
+	public void pullBranch(Git git) throws RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
 		CheckoutCommand checkout = git.checkout();
 		checkout.setCreateBranch(true);
 		checkout.setName(repInfo.getBranchName());

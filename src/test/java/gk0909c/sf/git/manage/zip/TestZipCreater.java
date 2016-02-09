@@ -1,4 +1,4 @@
-package gk0909c.sf.git.manage.helper;
+package gk0909c.sf.git.manage.zip;
 
 import static org.junit.Assert.*;
 
@@ -8,8 +8,9 @@ import java.io.IOException;
 import org.junit.Test;
 
 import gk0909c.sf.git.manage.test.helper.TestHelper;
+import gk0909c.sf.git.manage.zip.ZipCreater;
 
-public class TestZipHelper {
+public class TestZipCreater {
 
 	@Test
 	/* This test is Cutting corners... */
@@ -20,13 +21,15 @@ public class TestZipHelper {
 		baseDir.mkdir();
 		File subDir = new File(baseDir.getAbsolutePath() + "/subDir");
 		subDir.mkdir();
+		File subDir2 = new File(baseDir.getAbsolutePath() + "/subDir2");
+		subDir2.mkdir();
 		File file1 = new File(baseDir.getAbsolutePath() + "/file1.txt");
 		file1.createNewFile();
 		File file2 = new File(subDir.getAbsolutePath() + "/file2.txt");
 		file2.createNewFile();
 		
 		// run and assert
-		ZipHelper helper = new ZipHelper();
+		ZipCreater helper = new ZipCreater();
 		File zipFile = new File(currentDirectory.getAbsolutePath() + "/test.zip");
 		String zipBase = currentDirectory.getAbsolutePath() + "/ziptest";
 		

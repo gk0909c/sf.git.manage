@@ -3,8 +3,7 @@ package gk0909c.sf.git.manage.git;
 import lombok.Data;
 
 @Data
-public
-class RepositoryInfo {
+public class RepositoryInfo {
 	/** Remote Repository User */
 	private String user;
 	/** Remote Repository Password */

@@ -19,41 +19,26 @@ import com.sforce.soap.partner.LoginResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
-import gk0909c.sf.git.manage.helper.ZipHelper;
+import gk0909c.sf.git.manage.zip.ZipCreater;
 
-class SfdcOperator {
+public class SfdcOperator {
+	private MetadataConnection metaConn;
 	
-	/*protected void deployMetadata() throws IOException {
-		ZipHelper helper = new ZipHelper();
-		String zipFile = "C:/git-temp/tmp/test.zip";
-		String baseDir = "C:/git-temp/tmp/src";
-		
-		helper.createZip(zipFile, baseDir);
-		
-	}*/
-	
-	public static void main(String args[]) throws Exception {
-		// TODO 手で作ったzipならできた。Zipの中身が認識されていない模様。（Windows標準で解凍できないのと関連ある？
-		
-		/*ZipHelper helper = new ZipHelper();
-		String zipFile = "C:/git-temp/tmp/test.zip";
-		String baseDir = "C:/git-temp/tmp/src";
-		helper.createZip(zipFile, baseDir);*/
-		
+	public SfdcOperator(SfdcInfo info) throws ConnectionException {
 		ConnectorConfig config = new ConnectorConfig();
-		config.setAuthEndpoint("https://login.salesforce.com/services/Soap/u/35.0");
-		config.setServiceEndpoint("https://login.salesforce.com/services/Soap/u/35.0");
+		config.setAuthEndpoint(info.getPartnerUri());
+		config.setServiceEndpoint(info.getPartnerUri());
 		config.setManualLogin(true);
-		config.setProxy("proxy.ad.techvan.co.jp", 8080);
 		PartnerConnection partnerConn = new PartnerConnection(config);
-		LoginResult loginResult = partnerConn.login("satohk@dev.technovan.co.jp", "satken0909OisU91X6uT6tSHKavUhXofIX");
+		LoginResult loginResult = partnerConn.login(info.getUser(), info.getPw() + info.getSecurityToken());
 				
 		config = partnerConn.getConfig();
 		config.setServiceEndpoint(loginResult.getMetadataServerUrl());
 		config.setSessionId(loginResult.getSessionId());
-		//config.setProxy("proxy.ad.techvan.co.jp", 8080);
-		MetadataConnection metaConn = new MetadataConnection(config);
-		
+		metaConn = new MetadataConnection(config);
+	}
+	
+	public void getMetadata() throws Exception {
 		String ZIP_FILE = "C:/git-temp/tmp/test.zip";
 		long ONE_SECOND = 1000;
 		int MAX_NUM_POLL_REQUESTS = 50;
@@ -75,8 +60,6 @@ class SfdcOperator {
 		DeployOptions deployOptions = new DeployOptions();
 		deployOptions.setPerformRetrieve(false);
 		deployOptions.setRollbackOnError(true);
-		deployOptions.setIgnoreWarnings(false);
-		//deployOptions.setSinglePackage(true);
 		AsyncResult asyncResult = metaConn.deploy(zipBytes, deployOptions);
 
 		// wait finish =================================================================
