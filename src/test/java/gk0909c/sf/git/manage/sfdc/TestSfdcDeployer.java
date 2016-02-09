@@ -13,15 +13,15 @@ import gk0909c.sf.git.manage.zip.ZipCreater;
 import gk0909c.sf.git.manage.zip.ZipInfo;
 
 
-public class TestSfdcOperator {
+public class TestSfdcDeployer {
 	private ZipInfo zipInfo;
 	private SfdcInfo sfdcInfo;
 	
 	@Test
 	public void testDeployMetadata01() throws Exception {
-		setUp("TestSfdcOperator/testDeployMetadata01", "TestSfdcOperator/testDeployMetadata.yml");
+		setUp("TestSfdcDeployer/testDeployMetadata01", "TestSfdcDeployer/testDeployMetadata.yml");
 
-		SfdcOperator operator = new SfdcOperator(sfdcInfo);
+		SfdcDeployer operator = new SfdcDeployer(sfdcInfo);
 		operator.deployMetadata(zipInfo);
 		
 		DeleteResult[] result  = operator.metaConn.deleteMetadata("CustomLabel", new String[]{"Gk_TestDeployLabel"});
@@ -32,9 +32,9 @@ public class TestSfdcOperator {
 	
 	@Test
 	public void testDeployMetadata02() throws Exception {
-		setUp("TestSfdcOperator/testDeployMetadata02", "TestSfdcOperator/testDeployMetadata.yml");
+		setUp("TestSfdcDeployer/testDeployMetadata02", "TestSfdcDeployer/testDeployMetadata.yml");
 
-		SfdcOperator operator = new SfdcOperator(sfdcInfo);
+		SfdcDeployer operator = new SfdcDeployer(sfdcInfo);
 		try {
 			operator.deployMetadata(zipInfo);
 			fail();

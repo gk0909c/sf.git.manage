@@ -24,7 +24,7 @@ import gk0909c.sf.git.manage.zip.ZipInfo;
  * @author satk0909
  *
  */
-public class SfdcOperator {
+public class SfdcDeployer {
 	private static final long ONE_SECOND = 1000;
 	private static final int MAX_NUM_POLL_REQUESTS = 50;
 	
@@ -35,7 +35,7 @@ public class SfdcOperator {
 	 * @param info SfdcInfo
 	 * @throws ConnectionException
 	 */
-	public SfdcOperator(SfdcInfo info) throws ConnectionException {
+	public SfdcDeployer(SfdcInfo info) throws ConnectionException {
 		ConnectorConfig config = new ConnectorConfig();
 		config.setAuthEndpoint(info.getPartnerUri());
 		config.setServiceEndpoint(info.getPartnerUri());
@@ -193,7 +193,7 @@ public class SfdcOperator {
 		}
 		
 		if (System.getProperty("https.proxyPassword") != null ) {
-			config.setProxyPassword(System.getProperty("https.Password"));
+			config.setProxyPassword(System.getProperty("https.proxyPassword"));
 		}
 	}
 }

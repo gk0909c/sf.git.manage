@@ -7,6 +7,8 @@ import org.yaml.snakeyaml.Yaml;
 
 import gk0909c.sf.git.manage.git.GitOperator;
 import gk0909c.sf.git.manage.git.RepositoryInfo;
+import gk0909c.sf.git.manage.sfdc.SfdcInfo;
+import gk0909c.sf.git.manage.sfdc.SfdcDeployer;
 import gk0909c.sf.git.manage.zip.ZipCreater;
 import gk0909c.sf.git.manage.zip.ZipInfo;
 
@@ -39,5 +41,13 @@ public class App {
 		ZipInfo zipInfo = (ZipInfo)settingMap.get("zip");
 		ZipCreater helper = new ZipCreater();
 		helper.createZip(zipInfo.getZipPath(), zipInfo.getBaseDir());
+		
+		// Deploy
+		SfdcInfo sfdcInfo = (SfdcInfo)settingMap.get("sfdc");
+		SfdcDeployer operator = new SfdcDeployer(sfdcInfo);
+		operator.deployMetadata(zipInfo);
+		
+		// Run Test
+		
     }
 }

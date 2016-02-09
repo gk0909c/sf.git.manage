@@ -40,5 +40,12 @@
   Make yaml file in classpath.  (only repository info. no need hierarchy.)
   + testGetReporsitory01.yml, with no user, no pw.
   + testGetReporsitory02.yml, with your user, your pw.
++ To Execute gk0909c.sf.git.manage.sfdc.TestSfdcDeployer,  
+  Make yaml file(testDeployMetadata.yml) in classpath.  (only sfdc info. no need hierarchy.)
   
 ## behind proxy ##
+use jvm args.  
++ https.proxyHost
++ https.proxyPort
++ https.proxyUser
++ https.proxyPassword
