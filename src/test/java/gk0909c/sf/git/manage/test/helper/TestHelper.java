@@ -1,4 +1,4 @@
-package gk0909c.sf.git.manage.helper;
+package gk0909c.sf.git.manage.test.helper;
 
 import java.io.File;
 

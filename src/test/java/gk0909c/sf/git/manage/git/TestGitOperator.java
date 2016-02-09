@@ -6,7 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
-import gk0909c.sf.git.manage.helper.TestHelper;
+import gk0909c.sf.git.manage.test.helper.TestHelper;
 import junit.framework.TestCase;
 
 public class TestGitOperator extends TestCase {

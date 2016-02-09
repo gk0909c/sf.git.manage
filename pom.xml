@@ -26,20 +26,30 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>4.2.0.201601211800-r</version>
 		</dependency>
-		<dependency>
-	    <groupId>kz.idsoftware.sforce</groupId>
-	    <artifactId>sforce-tooling-api</artifactId>
-	    <version>35.0</version>
-    </dependency>
     <dependency>
 	    <groupId>org.projectlombok</groupId>
 	    <artifactId>lombok</artifactId>
 	    <version>1.16.6</version>
 	  </dependency>
+	  <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.10</version>
+    </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <version>1.16</version>
+    </dependency>
+    <dependency>
+      <groupId>com.force.api</groupId>
+      <artifactId>force-partner-api</artifactId>
+      <version>35.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.force.api</groupId>
+      <artifactId>force-metadata-api</artifactId>
+      <version>35.0.1</version>
     </dependency>
 	</dependencies>
 
