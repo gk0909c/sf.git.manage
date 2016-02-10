@@ -1,14 +1,8 @@
-# git管理しているSFDCリソースをデプロイしてテスト #
-開発中
+# sf git manage #
+deploy salesforce metadata, it's managed in git repository.
 
-## git操作 ##
-+ 初回はリポジトリクローン
-+ 特定ブランに切替
-+ ブランチを最新化
-
-## SFDC操作 ##
-+ 最新化したリソースをデプロイ
-+ Apexテスト実行
+## Create jar file ##
+'mvn clean compile assembly:single'
 
 ## Run ##
 + create setting.yml in classpath, like this.
@@ -34,12 +28,16 @@
     baseDir: C:/localtion/repository/sfdc-src-path
 
   ```
+
++ run command example. (setting.yml is in current directory)  
+  `java -cp sf.git.manage-1.0.jar;. gk0909c.sf.git.manage.App`  
   
 ## Unit test ##
 + To Execute gk0909c.sf.git.manage.git.TestGitOperator,  
   Make yaml file in classpath.  (only repository info. no need hierarchy.)
   + testGetReporsitory01.yml, with no user, no pw.
   + testGetReporsitory02.yml, with your user, your pw.
+  + both localBase is overwrote by junit temporary folder.
 + To Execute gk0909c.sf.git.manage.sfdc.TestSfdcDeployer,  
   Make yaml file(testDeployMetadata.yml) in classpath.  (only sfdc info. no need hierarchy.)
   
@@ -49,3 +47,4 @@ use jvm args.
 + https.proxyPort
 + https.proxyUser
 + https.proxyPassword
++ http.nonProxyHosts

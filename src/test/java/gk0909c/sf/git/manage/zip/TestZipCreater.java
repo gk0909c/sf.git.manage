@@ -5,20 +5,21 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import gk0909c.sf.git.manage.test.helper.TestHelper;
 import gk0909c.sf.git.manage.zip.ZipCreater;
 
 public class TestZipCreater {
+	@Rule
+	public TemporaryFolder tempFolder = new TemporaryFolder();
 
 	@Test
 	/* This test is Cutting corners... */
 	public void testCreateZip01() throws IOException {
 		// prepare
-		File currentDirectory = new File(".");
-		File baseDir = new File(currentDirectory.getAbsolutePath() + "/ziptest");
-		baseDir.mkdir();
+		File baseDir = tempFolder.newFolder("ziptest");
 		File subDir = new File(baseDir.getAbsolutePath() + "/subDir");
 		subDir.mkdir();
 		File subDir2 = new File(baseDir.getAbsolutePath() + "/subDir2");
@@ -30,16 +31,12 @@ public class TestZipCreater {
 		
 		// run and assert
 		ZipCreater helper = new ZipCreater();
-		File zipFile = new File(currentDirectory.getAbsolutePath() + "/test.zip");
-		String zipBase = currentDirectory.getAbsolutePath() + "/ziptest";
+		File zipFile = new File(tempFolder.getRoot() + "/test.zip");
 		
-		helper.createZip(zipFile.getAbsolutePath(), zipBase);
+		helper.createZip(zipFile.getAbsolutePath(), baseDir.getAbsolutePath());
 		
 		assertTrue(zipFile.exists());
 		
-		// clear prepared files
-		zipFile.delete();
-		TestHelper.delete(baseDir);
 	}
 
 }

@@ -28,13 +28,18 @@ public class App {
 	 */
     public static void main( String[] args ) throws Exception {
     	Logger logger = LoggerFactory.getLogger(App.class);
-    	
+    	logger.info("START");
     	
     	// 設定情報取得
     	Yaml yaml = new Yaml();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> settingMap = yaml.loadAs(ClassLoader.getSystemResourceAsStream("setting.yml"), Map.class);
-		
+
+    	// 確認
+		if (!confirmContinue(settingMap)) {
+    		return;
+    	}
+    	
 		// メタデータ取得
     	logger.info("Get repository resource.");
 		RepositoryInfo repositoryInfo = (RepositoryInfo)settingMap.get("repository");
@@ -61,5 +66,29 @@ public class App {
 		SfdcTestRunner runner = new SfdcTestRunner(sfdcInfo);
 		runner.runTest();
 		
+		logger.info("END");
+    }
+    
+    private static boolean confirmContinue(Map<String, Object> settingMap) {
+    	RepositoryInfo repositoryInfo = (RepositoryInfo)settingMap.get("repository");
+		SfdcInfo sfdcInfo = (SfdcInfo)settingMap.get("sfdc");
+    	
+    	System.out.println("## Repository ##");
+    	System.out.println("\tRepository: " + repositoryInfo.getUri());
+    	System.out.println("\tBranch: " + repositoryInfo.getBranchName());
+    	System.out.println("## SFDC ##");
+    	System.out.println("\tuser: " + sfdcInfo.getUser());
+    	System.out.println("\turl: " + sfdcInfo.getPartnerUri());
+    	System.out.print("Continue?(y, n) > ");
+    	
+    	java.util.Scanner sc = new java.util.Scanner(System.in);
+    	String input = sc.nextLine();
+    	sc.close();
+    	
+    	if ("y".equals(input)) {
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
 }
