@@ -1,6 +1,11 @@
 # sf git manage #
 deploy salesforce metadata, it's managed in git repository.
 
+## 開発するかもしれない（parhaps future develope) ##
++ 毎回リポジトリ更新もどうかと思う。タスクを選べるようにする？
++ 結果をレポートできたらよい。（Mavenレポート？）
++ Jenkinsで使えるとよい。
+
 ## Create jar file ##
 'mvn clean compile assembly:single'
 

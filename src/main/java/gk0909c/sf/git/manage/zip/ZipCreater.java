@@ -32,7 +32,7 @@ public class ZipCreater {
 		OutputStream out = new BufferedOutputStream(new FileOutputStream(zipFile));
 		
 		ZipArchiveOutputStream archive = new ZipArchiveOutputStream(out);
-		archive.setEncoding("Windows-31J");
+		archive.setEncoding("UTF-8");
 		
 		addAll(archive, baseDirFile.toURI(), baseDirFile);
 
